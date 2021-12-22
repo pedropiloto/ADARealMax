@@ -1,3 +1,6 @@
+var searchHistory = []
+var saleData = [];
+
 function getPlotByCoord(x,y) {
   let obj = plotsData.filter(item => item.x === x && item.y == y);
   return obj[0];
@@ -14,7 +17,13 @@ function searchPlotOnClick(elementId){
 	document.getElementById("x").value = clickedElement.getAttribute("x");
 	document.getElementById("y").value = clickedElement.getAttribute("y");
 	
-	displayPlotDetailsByCoord()
+
+	//if(clickedElement.getAttribute("assetName") != null){
+		//displayPlotFromHistory(clickedElement.getAttribute("assetName"));
+	//}
+	//else {
+		displayPlotDetailsByCoord();
+	//}
 }
 
 function convertFromHex(hex) {
@@ -59,6 +68,13 @@ function displayPlotDetailsByName() {
   setLabels(plotObj);
 }
 
+function displayPlotFromHistory(assetName) {
+	plotSearch = getPlotFromSearchHistory(assetName);
+
+
+
+}
+
 function displayPlotDetailsByAddress(policyId) {
 	var walletAddress = document.getElementById("walletAddress").value;
 	wallet = fetchWallet(walletAddress);
@@ -71,7 +87,6 @@ function displayPlotDetailsByAddress(policyId) {
 	clearSearch();
 	showResults();
 }
-
 
 
 function httpGet(theUrl)
@@ -99,6 +114,7 @@ function fetchWallet(walletAddress){
 function setLabels (plotObj) {
 	
 	var plotName = convertFromHex(plotObj.asset_name);
+	var onSale = false;
 	
 	fetchPlotCNFTData(plotName).then(cnftData => {
 	
@@ -107,6 +123,16 @@ function setLabels (plotObj) {
 			cnftsearch.innerHTML = (cnftData[0].price/1000000) + " ADA"
 			cnftsearch.setAttribute('href', "https://cnft.io/token/"+cnftData[0]._id)
 			cnftsearch.setAttribute('target',"_blank")
+
+			//check if plot already added
+			plotSearch = getPlotFromSearchHistory(plotName)	
+
+			if(plotSearch.length == 0){
+				searchHistory = searchHistory.concat(cnftData[0]);
+			}
+
+			onSale = true;
+			
 		}
 		else {
 			cnftsearch = document.getElementById("cnftsearchlink");
@@ -117,26 +143,25 @@ function setLabels (plotObj) {
 		
 
 		
-	  document.getElementById("asset_name").innerHTML = plotName;
-	  document.getElementById("policy_id").innerHTML = plotObj.policy_id;
-	  document.getElementById("label_x").innerHTML = plotObj.x;
-	  document.getElementById("label_y").innerHTML = plotObj.y;
-	  
-		
-	  poolpmURL = "https://pool.pm/"+plotObj.policy_id+"."+plotName
-	  poolpmGet = "https://pool.pm/asset/"+plotObj.policy_id+"."+plotName
-	  poolpm = document.getElementById("poolpmlink");
-		poolpm.innerHTML = poolpmURL
-		poolpm.setAttribute('href', poolpmURL)
-		poolpm.setAttribute('target',"_blank")
-		
-	  plotData = fetchPlotData(poolpmGet);
+	document.getElementById("asset_name").innerHTML = plotName;
+	document.getElementById("policy_id").innerHTML = plotObj.policy_id;
+	document.getElementById("label_x").innerHTML = plotObj.x;
+	document.getElementById("label_y").innerHTML = plotObj.y;
 
-	  document.getElementById("ownerAddress").innerHTML = plotData.owner;
-	  
-	  paintPlot(plotObj);
-	  clearSearch();
-	  showResults();
+
+	poolpmURL = "https://pool.pm/"+plotObj.policy_id+"."+plotName
+
+	poolpm = document.getElementById("poolpmlink");
+
+	poolpm.innerHTML = poolpmURL
+	poolpm.setAttribute('href', poolpmURL)
+	poolpm.setAttribute('target',"_blank")
+
+	document.getElementById("plotResults").style.display = "inline-block";
+
+	paintPlot(plotObj,onSale);
+	clearSearch();
+	showResults();
 	})
 }
 
@@ -160,10 +185,24 @@ function drawMap(){
 	for (var i = 0; i < plotsData.length; i++) { 
 		my_context.fillRect((parseInt(plotsData[i].x)+100)*4+1, (parseInt(plotsData[i].y)+100)*4+1, 3, 3);
 	}		
+
+	searchHistory = [];
 }
 
+function drawSaleData(){
+	for (let i = 0; i < saleData.length-1; i++) {
+			if(saleData[i].asset.assetId != 'RealmGold'){
+				let plotObj = {x:saleData[i].asset.metadata.Coordinates.x, 
+							y:saleData[i].asset.metadata.Coordinates.y};
 
-function paintPlot(plotObj) {
+				paintPlot(plotObj,true);
+				searchHistory = searchHistory.concat(saleData[i]);
+			}
+		}
+
+}
+
+function paintPlot(plotObj,onSale=false) {
 	var canvas = document.getElementById("canvas");
 	
 	var my_context = canvas.getContext('2d');
@@ -177,7 +216,12 @@ function paintPlot(plotObj) {
 		my_context.fillStyle = 'rgb(0, 255, 17)'
 	}
 	else {
-		my_context.fillStyle = 'rgb(255, 179, 179)';
+		if(onSale){
+			my_context.fillStyle = 'rgb(204, 153, 255)';
+		}
+		else {
+			my_context.fillStyle = 'rgb(255, 179, 179)';
+		}
 	}
 	my_context.fillRect(contextX, contextY, 3, 3);
 }
@@ -214,15 +258,26 @@ function getCursorPosition(event) {
 	if(plotObj != null){
 		var maptooltip = document.getElementById("maptooltip");
 		var canvas = document.getElementById("canvas");
-		
+		var assetName = convertFromHex(plotObj.asset_name);
+
 		canvas.setAttribute("x",plotObj.x)
 	    canvas.setAttribute("y",plotObj.y)
-		
+
+
+		plotSearch = getPlotFromSearchHistory(assetName);
+
+	
 		maptooltip.style.display = "inline-block"
-		maptooltip.innerHTML = "Plot " +convertFromHex(plotObj.asset_name)+ "<br />" + plotObj.x + " , " + plotObj.y
+		if(plotSearch.length > 0) {
+			maptooltip.innerHTML = "Plot " +assetName+ "<br />" + plotObj.x + " , " + plotObj.y  + "<br /> Price: " + plotSearch[0].price/1000000 + " ADA"
+			canvas.setAttribute("assetName",assetName)
+		}
+		else {
+			maptooltip.innerHTML = "Plot " +assetName+ "<br />" + plotObj.x + " , " + plotObj.y 
+			canvas.removeAttribute("assetName");
+		}
 	}
-	else {
-		
+	else {	
 		clearToolTip();
 	}
 	
@@ -232,6 +287,10 @@ function getCursorPosition(event) {
 
 function clearToolTip(){
 	maptooltip.style.display = "none"
+}
+
+function getPlotFromSearchHistory(assetName){
+	return searchHistory.filter(plot => plot.asset.assetId == assetName)
 }
 
 
@@ -260,4 +319,52 @@ async function fetchPlotCNFTData(plotName) {
 	return data.results
 }
 
+async function fetchAllPlotCNFTData() {
+	var continueFetching = true
+	var newArr = []
+	var page = 1
 
+	while(continueFetching) {
+		let response = await fetch("https://api.cnft.io/market/listings", {
+		  "headers": {
+			"accept": "application/json, text/plain, */*",
+			"accept-language": "en-GB,en;q=0.9,en-US;q=0.8,pt;q=0.7,cs;q=0.6,es;q=0.5",
+			"content-type": "application/json",
+			"sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Microsoft Edge\";v=\"96\"",
+			"sec-ch-ua-mobile": "?0",
+			"sec-ch-ua-platform": "\"Windows\"",
+			"sec-fetch-dest": "empty",
+			"sec-fetch-mode": "cors",
+			"sec-fetch-site": "same-site",
+			"Referer": "https://cnft.io/",
+			"Referrer-Policy": "strict-origin-when-cross-origin"
+		  },
+		  "body": "{\"search\":\"\",\"types\":[\"listing\",\"auction\",\"offer\"],\"project\":\"Ada Realm\",\"sort\":{\"_id\":-1},\"priceMin\":null,\"priceMax\":null,\"page\":"+page+",\"verified\":true,\"nsfw\":false,\"sold\":false,\"smartContract\":false}",
+		  "method": "POST"
+		});
+		
+		let data = await response.json()
+		
+		if(data.results.length == 0) {
+			continueFetching = false
+		}
+		newArr = newArr.concat(data.results)
+		page = page + 1
+		
+	}
+
+	return newArr
+}
+
+function enableSaleButton() {
+	document.getElementById("drawSaleData").disabled = false;
+}
+
+function fetchSaleData() {
+	fetchAllPlotCNFTData().then(saleDataInner => {
+		enableSaleButton();
+		saleData = saleData.concat(saleDataInner);
+
+	})	
+	
+}

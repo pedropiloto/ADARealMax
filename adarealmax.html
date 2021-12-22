@@ -112,7 +112,8 @@ img.loading {
 <script>
 
 window.onload = function () {
-		drawMap()
+		drawMap();
+		fetchSaleData();
 }
 
 
@@ -143,15 +144,14 @@ window.onload = function () {
 
 
 		<div id="resultsAsset" class="float-container" style="display:none">
-			<ul class="notATable">
+			<ul class="notATable" id="plotResults" style="display:none">
 				<li><label>Asset Name:</label><div id="asset_name"></div></li>
 				<li><label>Policy Id:</label><div id="policy_id"></div></p>
 				<li><label>Coordinates:</label><div><label id="label_x"></label> , <label id="label_y"></label></div></li>
 				<li><label>CNFT.IO:</label><div> <a href="" id="cnftsearchlink"/></a></div></li>
 				<li><label>Pool.pm:</label><div> <a href="" id="poolpmlink"/></a></div></li>
-				<li><label>Owner:</label><div id="ownerAddress"></div></li>
 			</ul>
-
+			<p><button onclick="drawMap()">Clear Map</button><button id="drawSaleData" onclick="drawSaleData()" disabled style="margin-left: 20px;">View Sale Data</button>
 			<div id="plotsOwned" style="display: inline-block;"></div>
 			<canvas id="canvas"  style="background-color: black;" width="800" height="800" onmousemove="getCursorPosition(event)" onmouseout="clearToolTip()" onclick="searchPlotOnClick(this.id);"></canvas>
 			<div class="tooltip" id="maptooltip"></div>
