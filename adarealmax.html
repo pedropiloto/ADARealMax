@@ -1,166 +1,198 @@
 <!DOCTYPE html>
 <html>
 <style>
-.notATable {
-  display:table;
-  list-style:none;
-  padding-left:0;
+	.notATable {
+		display: table;
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.notATable>li {
+		display: table-row;
+	}
+
+	.notATable>li>* {
+		display: table-cell;
+		padding: 5px;
+	}
+
+
+	.notATable label {
+		font-weight: bold;
+		text-align: left;
+	}
+
+	body {
+		position: relative;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		font-family: "Arial";
+	}
+
+	body {
+		background: url("");
+		background-size: cover;
+		background-position: left center;
+		background-repeat: no-repeat;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	.loading_assets{
+		text-decoration-color: #848484;
+		height: 5px;
+	}
+
+	
+	.loading_assets_img{
+		height: 20px;
+	}
+
+
+
+main {
+   height: 100%;
+   margin: 0 auto -60px;
 }
 
-.notATable > li 
- {
-  display:table-row;
- }
- 
- .notATable > li > *
- {
-  display:table-cell;
-  padding:5px;
- }
- 
- 
- .notATable label {
-  font-weight:bold;
-  text-align:left;
- }
- 
-body {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: "Arial";
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.footer-img{
+	height: 120px;
 }
 
-body {
-  background: url("");
-  background-size: cover;
-  background-position: left center;
-  background-repeat: no-repeat;
-}
+	#canvas {
+		width: 70%;
+		height: 40%
 
-button {
-  cursor: pointer;
-}
-button:focus {
-  outline: none;
-}
-button:active {
-  border-bottom: 3px solid #f4f4f4;
-  border-right: 3px solid #f4f4f4;
-  border-left: 3px solid #848484;
-  border-top: 3px solid #848484;
-}
+	}
 
-.outer {
-  display: table;
-  height: 100%;
-  width: 100%;
-}
+	button:focus {
+		outline: none;
+	}
 
-.middle {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.float-container {
-    border: 3px solid;
-    padding: 20px;
-	width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-	text-align: center;
-}
-
-img.loading {
-    background: transparent no-repeat scroll center center;
-}
-
-.grid {
-  display: inline-block;;
-  border-spacing: 5px
-}
-
-.row {
-  display: table-row
-}
-
-.cell {
-  width: 200px;
-  display: table-cell;
-  text-align: center;
-  border: 1px solid black;
-}
-
-.tooltip {
-	display: inline-block;
-	position: fixed;
-	padding: .5em 1em;
-	background-color: #f1f1f1;
-}
-
+	button:active {
+		border-bottom: 3px solid #f4f4f4;
+		border-right: 3px solid #f4f4f4;
+		border-left: 3px solid #848484;
+		border-top: 3px solid #848484;
+	}
 
 
 </style>
 
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<title>Ada Real Max</title>
+</head>
 
-
-<script src="plotsData.js"></script> 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="functions.js"></script>
-<script>
-
-window.onload = function () {
-		drawMap();
-		fetchSaleData();
-}
-
-
-</script>
 <body>
-<div class="outer">
-	<div class="middle">
-		<div class="float-container">
-			<div style="display: inline-block;text-align: initial;">
-				<div style="display: inline-block;width: 100%;text-align: center;">  <img id="defaultImage" src="adarealm.png" class="loading" width="100"></div>
-				<p><b>Ada Realm metaverse plots search</b></p>
-				<ul class="notATable">
-				<li><label>X:</label><div><input title="x" type="text" id="x" value=""></div>
-				<li><label>Y:</label><div><input title="y" type="text" id="y" value=""></div>
-				</ul>
-				<p><button onclick="displayPlotDetailsByCoord()">Get Plot By Coordinates!</button>
-				<ul class="notATable">
-				<li><label>Plot Name:</label><div><input title="plotName" type="text" id="plotName" value=""></div>
-				</ul>
-				<p><button onclick="displayPlotDetailsByName()">Get Plot By Name!</button>
-				<ul class="notATable">
-				<li><label>Address:</label><div><input title="walletAddress" type="text" id="walletAddress" value=""></div>
-				</ul>
-				<p><button onclick="displayPlotDetailsByAddress('b5240b3ae40bca2cc56b0fdfd7553724ccd18c56a98937d6b6f76265')">Get Plots By Address!</button>
-				<p>Click the button to display the plot attributes.</p>
+	<main class="container">
+		<div class="outer">
+			<div class="middle">
+				<div class="row">
+					<div class="col">
+						<div style="display: inline-block;text-align: initial;">
+							<div style="display: inline-block;width: 100%;text-align: center;"> <img id="defaultImage"
+									src="adarealm.png" class="loading" width="100"></div>
+							<p><b>Ada Realm metaverse plots search</b></p>
+							<ul class="notATable">
+								<li><label>X:</label>
+									<div><input title="x" type="text" id="x" value=""></div>
+								<li><label>Y:</label>
+									<div><input title="y" type="text" id="y" value=""></div>
+							</ul>
+							<p><button onclick="displayPlotDetailsByCoord()">Get Plot By Coordinates!</button>
+							<ul class="notATable">
+								<li><label>Plot Name:</label>
+									<div><input title="plotName" type="text" id="plotName" value=""></div>
+							</ul>
+							<p><button onclick="displayPlotDetailsByName()">Get Plot By Name!</button>
+							<ul class="notATable">
+								<li><label>Address:</label>
+									<div><input title="walletAddress" type="text" id="walletAddress" value=""></div>
+							</ul>
+							<p><button
+									onclick="displayPlotDetailsByAddress('b5240b3ae40bca2cc56b0fdfd7553724ccd18c56a98937d6b6f76265')">Get
+									Plots By Address!</button>
+							<p>Click the button to display the plot attributes.</p>
+						</div>
+
+					</div>
+					<div class="col">
+						<div id="resultsAsset">
+							<ul class="notATable" id="plotResults" >
+								<li><label>Asset Name:</label>
+									<div id="asset_name"></div>
+								</li>
+								<li><label>Policy Id:</label>
+									<div id="policy_id"></div>
+									</p>
+								<li><label>Coordinates:</label>
+									<div><label id="label_x"></label> , <label id="label_y"></label></div>
+								</li>
+								<li><label>CNFT.IO:</label>
+									<div> <a href="" id="cnftsearchlink" /></a></div>
+								</li>
+								<li><label>Pool.pm:</label>
+									<div> <a href="" id="poolpmlink" /></a></div>
+								</li>
+							</ul>
+							<p>
+							<div id="plotsOwned" style="display: inline-block;"></div>
+							<canvas id="canvas" style="background-color: black;" width="800" height="800"
+								onmousemove="getCursorPosition(event)" onmouseout="clearToolTip()"
+								onclick="searchPlotOnClick(this.id);"></canvas>
+							<div class="tooltip" id="maptooltip"></div>
+						</div>
+						<div class="row">
+							<div class="col">
+									<button onclick="drawMap()">Clear Map</button>
+							</div>
+							<div id="loading_assets" class="col">
+									<span>Loading Assets</span> <img class="loading_assets_img" src='./loading.gif'>
+							</div>
+					</div>
+					</div>
+				</div>
 			</div>
 		</div>
+	</main>
+		<footer class="text-center text-white footer navbar-fixed-bottom" style="background-color: #f1f1f1;">
+			<a class="thumbnail fancybox" rel="ligthbox" href="https://i.imgur.com/fwldXNc.png">
+				<img class="img-responsive footer-img" alt="" src="https://i.imgur.com/fwldXNc.png" />
+				<div class='text-right'>
+								<small class='text-muted'>Pay me a ☕ -> addr1q8ccrgddu2a58rfrqn9s2w54e5ga2weut57l4ldm6kxqeq2jz0h8l5282e66k2w39grxsgglyyk6mvxqjk4xy6zzu7wsq5ukgd</small>
+				</div> <!-- text-right / end -->
+</a>
+					</section>
+					<!-- Section: Social media -->
+			</div>
+			<!-- Grid container -->
+	
+			<!-- Copyright -->
+			
+			<!-- Copyright -->
+	</footer>
+		
+		<script src="plotsData.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="functions.js"></script>
+		<script>
 
-
-		<div id="resultsAsset" class="float-container" style="display:none">
-			<ul class="notATable" id="plotResults" style="display:none">
-				<li><label>Asset Name:</label><div id="asset_name"></div></li>
-				<li><label>Policy Id:</label><div id="policy_id"></div></p>
-				<li><label>Coordinates:</label><div><label id="label_x"></label> , <label id="label_y"></label></div></li>
-				<li><label>CNFT.IO:</label><div> <a href="" id="cnftsearchlink"/></a></div></li>
-				<li><label>Pool.pm:</label><div> <a href="" id="poolpmlink"/></a></div></li>
-			</ul>
-			<p><button onclick="drawMap()">Clear Map</button><button id="drawSaleData" onclick="drawSaleData()" disabled style="margin-left: 20px;">View Sale Data</button>
-			<div id="plotsOwned" style="display: inline-block;"></div>
-			<canvas id="canvas"  style="background-color: black;" width="800" height="800" onmousemove="getCursorPosition(event)" onmouseout="clearToolTip()" onclick="searchPlotOnClick(this.id);"></canvas>
-			<div class="tooltip" id="maptooltip"></div>
-		</div>
-	</div>
-</div>
-<div class="outer">
-		<img src="tippingJar.png" alt="Tippin Jar Address" style=" display: block; margin: auto;">
-		<figcaption style="font-size: 16px; text-align: center;" style=" display: block; margin: auto;">Tripping JAR: <br> addr1q8ccrgddu2a58rfrqn9s2w54e5ga2weut57l4ldm6kxqeq2jz0h8l5282e66k2w39grxsgglyyk6mvxqjk4xy6zzu7wsq5ukgd</figcaption>
-</div>
+			window.onload = function () {
+				drawMap();
+				fetchSaleData();
+			}
+		</script>
 </body>
+
 </html>
