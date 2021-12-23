@@ -143,14 +143,15 @@ function setLabels(plotObj) {
 
 
 		document.getElementById("asset_name").innerHTML = plotName;
-		document.getElementById("policy_id").innerHTML = plotObj.policy_id;
-		document.getElementById("label_x").innerHTML = plotObj.x;
-		document.getElementById("label_y").innerHTML = plotObj.y;
+		document.getElementById("coord_x").innerHTML = `<b>x=</b>${plotObj.x}`;
+		document.getElementById("coord_y").innerHTML = `<b>y=</b>${plotObj.y}`;
 
 
 		poolpmURL = "https://pool.pm/" + plotObj.policy_id + "." + plotName
 
 		poolpm = document.getElementById("poolpmlink");
+
+		console.log(poolpmURL)
 
 		poolpm.innerHTML = poolpmURL
 		poolpm.setAttribute('href', poolpmURL)
@@ -175,7 +176,7 @@ function drawMap() {
 	var canvas = document.getElementById("canvas");
 	var my_context = canvas.getContext('2d');
 
-	my_context.rect(0, 0, 800, 800);
+	my_context.rect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 	my_context.fillStyle = 'rgb(54, 52, 0)';
 
 	var xvalue = 0;
@@ -239,55 +240,14 @@ function paintWalletPlots(walletPlots) {
 }
 
 function getCursorPosition(event) {
-	var x = event.offsetX;
-	var y = event.offsetY;
-
-
-	var mousex = event.clientX;
-	var mousey = event.clientY;
-	$(".tooltip").css({
-		"left": mousex + 10,
-		"top": mousey - 20
-	});
-
-
-	plotX = Math.floor((x - 1) / 4 - 100);
-	plotY = Math.floor((y - 1) / 4 - 100);
+	plotX = Math.floor((event.offsetX - 1) / 4 - 100);
+	plotY = Math.floor((event.offsetY - 1) / 4 - 100);
 
 	plotObj = getPlotByCoord(String(plotX), String(plotY));
 
 	if (plotObj != null) {
-		var maptooltip = document.getElementById("maptooltip");
-		var canvas = document.getElementById("canvas");
-		var assetName = convertFromHex(plotObj.asset_name);
-
-		canvas.setAttribute("x", plotObj.x)
-		canvas.setAttribute("y", plotObj.y)
-
-
-		plotSearch = getPlotFromSearchHistory(assetName);
-
-
-		maptooltip.style.display = "inline-block"
-		if (plotSearch.length > 0) {
-			maptooltip.innerHTML = "Plot " + assetName + "<br />" + plotObj.x + " , " + plotObj.y + "<br /> Price: " + plotSearch[0].price / 1000000 + " ADA"
-			canvas.setAttribute("assetName", assetName)
-		}
-		else {
-			maptooltip.innerHTML = "Plot " + assetName + "<br />" + plotObj.x + " , " + plotObj.y
-			canvas.removeAttribute("assetName");
-		}
+		setLabels(plotObj)
 	}
-	else {
-		clearToolTip();
-	}
-
-
-
-}
-
-function clearToolTip() {
-	maptooltip.style.display = "none"
 }
 
 function getPlotFromSearchHistory(assetName) {
@@ -329,7 +289,6 @@ async function fetchAllPlotCNFTData() {
 	let chunks = splitToBulks(pages)
 
 	const requests = chunks.map(chunk => chunk.map(page => {
-		console.log('requesting page', page)
 		return requestCnftAdaRealmPage(page
 		)
 	}
